@@ -16,7 +16,7 @@ var faye, theImage, faceDetector, imageProcessing;
 		if (!imageProcessing && lastPng) {
 			imageProcessing = true;
 			cv.readImage(lastPng, function(err, im){
-			  im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){
+			  im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){ // consider adding opts instead of empty object
 			    var face;
 			    for (var i=0;i<faces.length; i++){
 			      if (!face.width) face = faces[i]; // if no face has already been selected, set equal to first face detected
@@ -30,7 +30,24 @@ var faye, theImage, faceDetector, imageProcessing;
 		    	var centerY = im.height()*0.5 // verticle center of image
 
 		    	var verticleAdjustment = -(face.y - centerY) / centerY;
-		    	var turnAjustment = -(face.x - centerX) / centerX;
+		    	var turnAjustment = -(face.x - centerX) / centerX; 
+
+
+		    	if(turnAdjustment < 0) {
+		    		return faye.publish("/drone/move", { // sends a message to /drone/ with details of the action and speed
+		    			action: 'clockwise';	
+		    	}
+          else {
+          	action: 'counterClockwise';
+          }
+          
+          if(verticleAdjustment < 0) {
+		    		return faye.publish("/drone/move", { // sends a message to /drone/ with details of the action and speed
+		    			action: 'up';	
+		    	}
+          else {
+          	action: 'down';
+          }
 			    
 			    // im.save('./out.jpg');
 			  });
