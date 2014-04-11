@@ -17,13 +17,22 @@ var faye, theImage, faceDetector, imageProcessing;
 			imageProcessing = true;
 			cv.readImage(lastPng, function(err, im){
 			  im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){
-			    //add test for biggest or a particular face
 			    var face;
 			    for (var i=0;i<faces.length; i++){
-			      face = faces[i]
-			      im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
-			    }
-			    im.save('./out.jpg');
+			      if (!face.width) face = faces[i]; // if no face has already been selected, set equal to first face detected
+			      if (faces[i].width > face.width { // check whether current face is wider than previously selected face
+			      	face = faces[i]; // should improve face selection algorithm
+			    	}
+			    }  
+		      // im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
+		    	console.log(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
+		    	var centerX = im.width()*0.5 // horizontal center of image
+		    	var centerY = im.height()*0.5 // verticle center of image
+
+		    	var verticleAdjustment = -(face.y - centerY) / centerY;
+		    	var turnAjustment = -(face.x - centerX) / centerX;
+			    
+			    // im.save('./out.jpg');
 			  });
 			})
 		}
