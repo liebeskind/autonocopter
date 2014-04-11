@@ -10,6 +10,7 @@
     "express": "3.x",
     "ar-drone": "git://github.com/felixge/node-ar-drone.git",
     "faye": "1.x",
-    "dronestream": "1.1.x"
+    "dronestream": "1.1.x",
+    "opencv": "0.5"
   }
 }

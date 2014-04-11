@@ -5,6 +5,7 @@
   faye = require('faye');
   drone = require("ar-drone").createClient(); // enables communication with drone in javascript
   leap = require('leapjs');
+  cv = require('opencv');
   require("dronestream").listen(3001); // for video rendering
   app = express();
   app.configure(function () {
@@ -18,7 +19,7 @@
   
   var bayeux = new faye.NodeAdapter({  // central messaging server for clients to communicate with one another; Can also add 'engine' property, which controls backend of the server (ie faye-redis) and 'ping' property, which is how often, in seconds, to send keep-alive ping messages over WebSocket and EventSource connections. Used if Faye server will be accessed through a proxy that kills idle connections.
     mount: '/faye', // path on the host at which the Faye service is available (ie http://localhost:3001/faye).
-    timeout: 50  // maximum time to hold connection open before returning response. Given in seconds and must be smaller than timeout on frontend webserver. 
+    timeout: 40  // maximum time to hold connection open before returning response. Given in seconds and must be smaller than timeout on frontend webserver. 
   }); 
 
   bayeux.attach(server); // attached to server; will handle all requests to paths matching the mount path and delegate all other requests to handlers.

@@ -21,6 +21,17 @@ Faye for publishing and subscribing between leap, server and drone
 Leap.js for converting leap motions into javascript
 jQuery for browser displays and accessing keypresses for optional keyboard controls
 
+Installing OpenCV
+=======================
+
+You will need to install opencv on your local machine.  This is done most easily by using Homebrew.
+brew install opencv
+
+If you get the error "Error: No available formula for opencv", then first run: 
+brew tap homebrew/science
+
+If you're still having trouble, try using this guide: http://www.jeffreythompson.org/blog/2013/08/22/update-installing-opencv-on-mac-mountain-lion/
+
 Learn More
 =======================
 
