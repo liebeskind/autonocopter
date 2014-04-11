@@ -17,9 +17,11 @@ var faye, theImage, faceDetector, imageProcessing;
 			imageProcessing = true;
 			cv.readImage(lastPng, function(err, im){
 			  im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){
+			    //add test for biggest or a particular face
+			    var face;
 			    for (var i=0;i<faces.length; i++){
-			      var x = faces[i]
-			      im.ellipse(x.x + x.width/2, x.y + x.height/2, x.width/2, x.height/2);
+			      face = faces[i]
+			      im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
 			    }
 			    im.save('./out.jpg');
 			  });

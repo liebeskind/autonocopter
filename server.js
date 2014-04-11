@@ -38,7 +38,6 @@
   });
 
   pngStream
-  .on('error', console.log('error with pngStream'))
   .on("data", function(pngBuffer) {  // requires ffmpeg to be installed, which can be done with HomeBrew
     lastPng = pngBuffer;
     client.publish("/drone/image", "/image/" + (Math.random())); // publishes each image to a randomly generated number
