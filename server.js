@@ -7,7 +7,7 @@
   pngStream = drone.getPngStream(); //pulls PNGs for image processing
   leap = require('leapjs');
   cv = require('opencv');
-  require("dronestream").listen(3001); // for video rendering
+  // require("dronestream").listen(3001); // for video rendering
   app = express();
   app.configure(function () {
     app.set('port', process.env.PORT || 3000); // process.env.PORT adjusts PORT to accept environmental parameter (ie deploying to Heroku)
