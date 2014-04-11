@@ -1,9 +1,10 @@
-  var express, path, drone, server, app, faye, client, leap, controller;
+  var express, path, drone, server, app, faye, client, leap, controller, pngStream;
 
   express = require("express");
   path = require("path");
   faye = require('faye');
   drone = require("ar-drone").createClient(); // enables communication with drone in javascript
+  pngStream = drone.getPngStream(); //pulls PNGs for image processing
   leap = require('leapjs');
   cv = require('opencv');
   require("dronestream").listen(3001); // for video rendering
@@ -34,6 +35,18 @@
   client.subscribe("/drone/drone", function (d) { // drone commands include takeoff and landing
     console.log(d);
       return drone[d.action]();
+  });
+
+  pngStream.on("data", function(pngBuffer) {  // requires ffmpeg to be installed, which can be done with HomeBrew
+    lastPng = pngBuffer;
+    client.publish("/drone/image", "/image/" + (Math.random())); // publishes each image to a randomly generated number
+  });
+
+  app.get("/image/:id", function(req, res) {
+    res.writeHead(200, {
+      "Content-Type": "image/png"
+    });
+    return res.end(lastPng);
   });
 
   server.listen(app.get('port'), function () {
