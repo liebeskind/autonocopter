@@ -54,7 +54,7 @@
 
   $(document).keydown(function (event) {
     var action;
-    if (!keymap[event.keyCode] || password !== 'masterpassword') { // prevents accidental keyboard controls: if key pressed is not assigned in the keymap above, return out of the function.
+    if (!keymap[event.keyCode]) { // prevents accidental keyboard controls: if key pressed is not assigned in the keymap above, return out of the function.
       return;
     }
     event.preventDefault(); // prevents a key's default action from occuring

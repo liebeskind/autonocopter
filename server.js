@@ -62,14 +62,13 @@
       imageProcessing = true;
       cv.readImage(lastPng, function(err, im){
       
-
         // im.convertGrayscale()
         // im.canny(5, 300)
         // im.houghLinesP()
         
         var opts = {};
         im.detectObject(cv.FACE_CASCADE, opts, function(err, faces){ // consider adding opts instead of empty object
-          face = faces[0];
+          if (faces) face = faces[0];
           if (faces.length>1){
             for (var i=1;i<faces.length-1; i++){
               if (face.width && face.width < faces[i].width) face = faces[i]; // if no face has already been selected, set equal to first face detected
@@ -89,33 +88,36 @@
 
             var verticleAdjustment = (faceY - centerY);
             var turnAdjustment = -(faceX - centerX); 
-            console.log('verticle is' + verticleAdjustment);
-            // console.log('turn is' + turnAdjustment);
 
-            if (Math.abs(turnAdjustment) > 20) {
+            var verticleSpeed = Math.min(0.2,Math.max(0.05,Math.abs(verticleAdjustment/300)));
+            var turnSpeed = Math.min(0.2,Math.max(0.05,Math.abs(turnAdjustment/500)));
+
+            console.log('verticle is' + verticleAdjustment);
+            console.log('turn is' + turnAdjustment);
+
+            if (Math.abs(turnAdjustment) > 30) {
               if(turnAdjustment < 0) {
                 console.log("turning right")
-                drone['clockwise'](0.1) 
+                drone['clockwise'](turnSpeed) 
               }
               else if (turnAdjustment > 0) {
                 console.log("turning left")
-                drone['counterClockwise'](0.1) 
+                drone['counterClockwise'](turnSpeed)
               }
             }
             
-            if (Math.abs(verticleAdjustment) > 20) {
+            if (Math.abs(verticleAdjustment) > 30) {
               if(verticleAdjustment < 0) {
                 console.log("going up")
-                return drone['up'](0.1) 
+                return drone['up'](verticleSpeed)
               }
               else {
                 console.log('going down')
-                return drone['down'](0.1) 
+                return drone['down'](verticleSpeed)
               }
             }
           }
           return im;
-          // im.save('./out.jpg');
         });
       })
     imageProcessing = false;
