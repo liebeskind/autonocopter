@@ -1,4 +1,4 @@
-  var express, path, drone, server, app, faye, client, leap, controller, pngStream, faceDetector, imageProcessing;
+  var express, path, drone, server, app, faye, client, leap, controller, pngStream, faceDetector, imageProcessing, newImage;
 
   express = require("express");
   path = require("path");
@@ -40,7 +40,7 @@
   pngStream
   .on("data", function(pngBuffer) {  // requires ffmpeg to be installed, which can be done with HomeBrew
     faceDetector(pngBuffer);
-    lastPng = pngBuffer
+    // newImage = pngBuffer
     client.publish("/drone/image", "/image/" + (Math.random())); // publishes each image to a randomly generated number
   });
 
@@ -48,7 +48,7 @@
     res.writeHead(200, {
       "Content-Type": "image/png"
     });
-    return res.end(lastPng);
+    return res.end(newImage);
   });
 
   server.listen(app.get('port'), function () {
@@ -61,6 +61,12 @@
     if (!imageProcessing && lastPng) {
       imageProcessing = true;
       cv.readImage(lastPng, function(err, im){
+      
+
+        // im.convertGrayscale()
+        // im.canny(5, 300)
+        // im.houghLinesP()
+        
         var opts = {};
         im.detectObject(cv.FACE_CASCADE, opts, function(err, faces){ // consider adding opts instead of empty object
           face = faces[0];
@@ -69,8 +75,10 @@
               if (face.width && face.width < faces[i].width) face = faces[i]; // if no face has already been selected, set equal to first face detected
             } 
           } 
-          // im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
+
           if (face) {
+            im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
+            newImage = im.toBuffer();
             console.log(face)
             // console.log(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
             var centerX = im.width()*0.5 // horizontal center of image
@@ -106,6 +114,7 @@
               }
             }
           }
+          return im;
           // im.save('./out.jpg');
         });
       })
