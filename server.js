@@ -62,18 +62,19 @@
       cv.readImage(lastPng, function(err, im){
       
       var processed = im;
-        // processed.convertGrayscale()
+        // processed.ConvertGrayscale()
         // processed.canny(5, 300)
         // processed.houghLinesP()
         
         processed.detectObject(cv.FACE_CASCADE, {}, function(err, faces){ // consider adding opts instead of empty object
           if (faces.length === 0) {
+            drone['stop'];
             return newImage = im.toBuffer();
           } else {
       
               for (var i=0;i<faces.length; i++){
-                if (face === undefined) face = faces[i];
-                if (face.width < faces[i].width && faces[i].width < 120) face = faces[i]; // if no face has already been selected, set equal to first face detected
+                if (face === undefined && faces[i].width < 120) face = faces[i];
+                if (face !== undefined && face.width < faces[i].width && faces[i].width < 120) face = faces[i]; // if no face has already been selected, set equal to first face detected
               } 
 
             if (face) {
@@ -89,11 +90,11 @@
               var verticleAdjustment = (faceY - centerY);
               var turnAdjustment = -(faceX - centerX); 
 
-              var verticleSpeed = Math.min(0.2,Math.max(0.05,Math.abs(verticleAdjustment/300)));
-              var turnSpeed = Math.min(0.2,Math.max(0.05,Math.abs(turnAdjustment/500)));
+              var verticleSpeed = Math.min(0.15,Math.max(0.01,Math.abs(verticleAdjustment/500)));
+              var turnSpeed = Math.min(0.15,Math.max(0.01,Math.abs(turnAdjustment/1700)));
 
-              console.log('verticle is' + verticleAdjustment);
-              console.log('turn is' + turnAdjustment);
+              console.log('verticle speed: ' + verticleSpeed);
+              console.log('turn speed: ' + turnSpeed);
 
               if (Math.abs(turnAdjustment) > 30) {
                 if(turnAdjustment < 0) {
