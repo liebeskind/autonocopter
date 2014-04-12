@@ -1,12 +1,13 @@
-  var express, path, drone, server, app, faye, client, leap, controller, pngStream, faceDetector, imageProcessing, newImage;
+  var express, path, drone, server, app, faye, client, leap, controller, pngStream, stream, faceDetector, imageProcessing, newImage;
 
   express = require("express");
   path = require("path");
   faye = require('faye');
   drone = require("ar-drone").createClient(); // enables communication with drone in javascript
-  pngStream = drone.getPngStream(); //pulls PNGs for image processing
   leap = require('leapjs');
   cv = require('opencv');
+  stream = new cv.ImageStream();
+  pngStream = drone.createPngStream().pipe(stream); //pulls PNGs for image processing
   // require("dronestream").listen(3001); // for video rendering
   app = express();
   app.configure(function () {
@@ -40,7 +41,6 @@
   pngStream
   .on("data", function(pngBuffer) {  // requires ffmpeg to be installed, which can be done with HomeBrew
     faceDetector(pngBuffer);
-    // newImage = pngBuffer
     client.publish("/drone/image", "/image/" + (Math.random())); // publishes each image to a randomly generated number
   });
 
@@ -66,58 +66,58 @@
         // im.canny(5, 300)
         // im.houghLinesP()
         
-        var opts = {};
-        im.detectObject(cv.FACE_CASCADE, opts, function(err, faces){ // consider adding opts instead of empty object
-          if (faces) face = faces[0];
-          if (faces.length>1){
-            for (var i=1;i<faces.length-1; i++){
-              if (face.width && face.width < faces[i].width) face = faces[i]; // if no face has already been selected, set equal to first face detected
-            } 
-          } 
-
-          if (face) {
-            im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
-            newImage = im.toBuffer();
-            console.log(face)
-            // console.log(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
-            var centerX = im.width()*0.5 // horizontal center of image
-            var centerY = im.height()*0.5 // verticle center of image
-
-            var faceX = face.x + face.width*0.5;
-            var faceY = face.y + face.height*0.5;
-
-            var verticleAdjustment = (faceY - centerY);
-            var turnAdjustment = -(faceX - centerX); 
-
-            var verticleSpeed = Math.min(0.2,Math.max(0.05,Math.abs(verticleAdjustment/300)));
-            var turnSpeed = Math.min(0.2,Math.max(0.05,Math.abs(turnAdjustment/500)));
-
-            console.log('verticle is' + verticleAdjustment);
-            console.log('turn is' + turnAdjustment);
-
-            if (Math.abs(turnAdjustment) > 30) {
-              if(turnAdjustment < 0) {
-                console.log("turning right")
-                drone['clockwise'](turnSpeed) 
-              }
-              else if (turnAdjustment > 0) {
-                console.log("turning left")
-                drone['counterClockwise'](turnSpeed)
-              }
-            }
+        im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){ // consider adding opts instead of empty object
+          if (!faces) {
+            return newImage = im.toBuffer();
+          } else {
+      
+              for (var i=0;i<faces.length; i++){
+                if (face === undefined) face = faces[i];
+                if (face.width < faces[i].width && faces[i].width < 120) face = faces[i]; // if no face has already been selected, set equal to first face detected
+              } 
             
-            if (Math.abs(verticleAdjustment) > 30) {
-              if(verticleAdjustment < 0) {
-                console.log("going up")
-                return drone['up'](verticleSpeed)
+            if (face) {
+              console.log('face size: ' + face.width)
+              im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
+              newImage = im.toBuffer();
+              var centerX = im.width()*0.5 // horizontal center of image
+              var centerY = im.height()*0.5 // verticle center of image
+
+              var faceX = face.x + face.width*0.5;
+              var faceY = face.y + face.height*0.5;
+
+              var verticleAdjustment = (faceY - centerY);
+              var turnAdjustment = -(faceX - centerX); 
+
+              var verticleSpeed = Math.min(0.2,Math.max(0.05,Math.abs(verticleAdjustment/300)));
+              var turnSpeed = Math.min(0.2,Math.max(0.05,Math.abs(turnAdjustment/500)));
+
+              console.log('verticle is' + verticleAdjustment);
+              console.log('turn is' + turnAdjustment);
+
+              if (Math.abs(turnAdjustment) > 30) {
+                if(turnAdjustment < 0) {
+                  console.log("turning right")
+                  drone['clockwise'](turnSpeed) 
+                }
+                else if (turnAdjustment > 0) {
+                  console.log("turning left")
+                  drone['counterClockwise'](turnSpeed)
+                }
               }
-              else {
-                console.log('going down')
-                return drone['down'](verticleSpeed)
+              
+              if (Math.abs(verticleAdjustment) > 30) {
+                if(verticleAdjustment < 0) {
+                  console.log("going up")
+                  return drone['up'](verticleSpeed)
+                }
+                else {
+                  console.log('going down')
+                  return drone['down'](verticleSpeed)
+                }
               }
             }
-          }
-          return im;
+          } 
         });
       })
     imageProcessing = false;
