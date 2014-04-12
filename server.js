@@ -1,13 +1,12 @@
-  var express, path, drone, server, app, faye, client, leap, controller, pngStream, stream, faceDetector, imageProcessing, newImage;
+  var express, path, drone, server, app, faye, client, leap, controller, pngStream, faceDetector, imageProcessing, newImage;
 
   express = require("express");
   path = require("path");
   faye = require('faye');
   drone = require("ar-drone").createClient(); // enables communication with drone in javascript
+  pngStream = drone.getPngStream(); //pulls PNGs for image processing
   leap = require('leapjs');
   cv = require('opencv');
-  stream = new cv.ImageStream();
-  pngStream = drone.createPngStream().pipe(stream); //pulls PNGs for image processing
   // require("dronestream").listen(3001); // for video rendering
   app = express();
   app.configure(function () {
