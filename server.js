@@ -73,12 +73,12 @@
           } else {
       
               for (var i=0;i<faces.length; i++){
-                if (face === undefined && faces[i].width < 120) face = faces[i];
-                if (face !== undefined && face.width < faces[i].width && faces[i].width < 120) face = faces[i]; // if no face has already been selected, set equal to first face detected
+                im.ellipse(faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2, faces[i].width/2, faces[i].height/2, [0, 255, 0]);
+                if (face === undefined) face = faces[i];
+                if (face !== undefined && face.width < faces[i].width) face = faces[i]; // if no face has already been selected, set equal to first face detected
               } 
 
             if (face) {
-              console.log('face size: ' + face.width)
               im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
               newImage = im.toBuffer();
               var centerX = im.width()*0.5 // horizontal center of image
@@ -90,8 +90,8 @@
               var verticleAdjustment = (faceY - centerY);
               var turnAdjustment = -(faceX - centerX); 
 
-              var verticleSpeed = Math.min(0.15,Math.max(0.01,Math.abs(verticleAdjustment/500)));
-              var turnSpeed = Math.min(0.15,Math.max(0.01,Math.abs(turnAdjustment/1700)));
+              var verticleSpeed = Math.min(0.08,Math.max(0.01,Math.abs(verticleAdjustment/500)));
+              var turnSpeed = Math.min(0.08,Math.max(0.01,Math.abs(turnAdjustment/1700)));
 
               console.log('verticle speed: ' + verticleSpeed);
               console.log('turn speed: ' + turnSpeed);
