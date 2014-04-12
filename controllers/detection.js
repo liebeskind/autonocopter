@@ -1,19 +1,21 @@
-(function() {
-var faye, theImage, faceDetector, imageProcessing;
+var faye, theImage, faceDetector, imageProcessing, lastPng;
 
   faye = new Faye.Client("/faye", {
     timeout: 120, // may need to adjust. If server doesn't send back any data for the given period of time, the client will assume the server has gone away and will attempt to reconnect. Timeout is given in seconds and should be larger than timeout on server side to give the server ample time to respond.
     retry: 2 // may need to adjust. How often the client will try to reconnect if connection to server is lost
   });
 
-  faye.subscribe("/drone/image", function(src) {
-    console.log(src);
-    lastPng = src;
-  });
+  // faye.subscribe("/drone/detection", function(src) {
+  //   lastPng = src;
+  // });
 
-  faceDetector = function() {
+  imageProcessing = false;
+
+  exports.faceDetector = function(lastPng) {
+  	console.log('executes');
 // should add test for whether flying
-		if (!imageProcessing && lastPng) {
+		if (imageProcessing === false && lastPng) {
+			console.log(lastPng);
 			imageProcessing = true;
 			cv.readImage(lastPng, function(err, im){
 			  im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){ // consider adding opts instead of empty object
@@ -59,7 +61,4 @@ var faye, theImage, faceDetector, imageProcessing;
 			  });
 			})
 		}
-  }
-
-
-}).call(this);
+	};

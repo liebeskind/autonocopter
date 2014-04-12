@@ -9,14 +9,15 @@
 	<script src="/faye/client.js"></script>
 	<script src="node_modules/leapjs/leap.js"></script>
 	<script src="node_modules/dronestream/dist/nodecopter-client.js"></script>
-	<script>
-	  $(function () {
-      function startArDRoneStream() {
-        new NodecopterStream(document.getElementById("placeholder"), {port: 3001});
-      }
-      startArDRoneStream();
-    })
-	</script>
+	// <script>
+	//   $(function () {
+ //      function startArDRoneStream() {
+ //        new NodecopterStream(document.getElementById("placeholder"), {port: 3001});
+ //      }
+ //      startArDRoneStream();
+ //    })
+	// </script>
+	<img id = "camera" />
 	<h1>LeapJS NodeDrone</h1>
 	<h4>Built using Nodejs, Faye, and Leapjs</h4>
 	<table>
@@ -62,6 +63,6 @@
 	</div>
 	<script src="/client.js"></script>
 	<script src="/leap.js"></script>
-	<script src="/detection.js"></script>
+	<!-- // <script src="/detection.js"></script> -->
 	</body>
 </html>

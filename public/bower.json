@@ -3,7 +3,7 @@
   "description": "Uses Node.js and Leap Motion to control an AR Drone while streaming video to the browser",
   "version": "0.0.1",
   "dependencies": {
-    "jquery": "~1.8",
+    "jquery": "latest",
     "express": "3.x",
     "ar-drone": "git://github.com/felixge/node-ar-drone.git",
     "faye": "1.x",

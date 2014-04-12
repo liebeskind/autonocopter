@@ -1,4 +1,4 @@
-  var express, path, drone, server, app, faye, client, leap, controller, pngStream;
+  var express, path, drone, server, app, faye, client, leap, controller, pngStream, faceDetector, imageProcessing;
 
   express = require("express");
   path = require("path");
@@ -39,7 +39,8 @@
 
   pngStream
   .on("data", function(pngBuffer) {  // requires ffmpeg to be installed, which can be done with HomeBrew
-    lastPng = pngBuffer;
+    faceDetector(pngBuffer);
+    lastPng = pngBuffer
     client.publish("/drone/image", "/image/" + (Math.random())); // publishes each image to a randomly generated number
   });
 
@@ -53,3 +54,61 @@
   server.listen(app.get('port'), function () {
     return console.log("Express server listening on port" + app.get("port"));
   })
+
+  faceDetector = function(lastPng) {
+// should add test for whether flying
+    var face;
+    if (!imageProcessing && lastPng) {
+      imageProcessing = true;
+      cv.readImage(lastPng, function(err, im){
+        var opts = {};
+        im.detectObject(cv.FACE_CASCADE, opts, function(err, faces){ // consider adding opts instead of empty object
+          face = faces[0];
+          if (faces.length>1){
+            for (var i=1;i<faces.length-1; i++){
+              if (face.width && face.width < faces[i].width) face = faces[i]; // if no face has already been selected, set equal to first face detected
+            } 
+          } 
+          // im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
+          if (face) {
+            console.log(face)
+            // console.log(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
+            var centerX = im.width()*0.5 // horizontal center of image
+            var centerY = im.height()*0.5 // verticle center of image
+
+            var faceX = face.x + face.width*0.5;
+            var faceY = face.y + face.height*0.5;
+
+            var verticleAdjustment = (faceY - centerY);
+            var turnAdjustment = -(faceX - centerX); 
+            console.log('verticle is' + verticleAdjustment);
+            // console.log('turn is' + turnAdjustment);
+
+            if (Math.abs(turnAdjustment) > 20) {
+              if(turnAdjustment < 0) {
+                console.log("turning right")
+                drone['clockwise'](0.1) 
+              }
+              else if (turnAdjustment > 0) {
+                console.log("turning left")
+                drone['counterClockwise'](0.1) 
+              }
+            }
+            
+            if (Math.abs(verticleAdjustment) > 20) {
+              if(verticleAdjustment < 0) {
+                console.log("going up")
+                return drone['up'](0.1) 
+              }
+              else {
+                console.log('going down')
+                return drone['down'](0.1) 
+              }
+            }
+          }
+          // im.save('./out.jpg');
+        });
+      })
+    imageProcessing = false;
+    }
+  };
