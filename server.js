@@ -61,12 +61,13 @@
       imageProcessing = true;
       cv.readImage(lastPng, function(err, im){
       
-        // im.convertGrayscale()
-        // im.canny(5, 300)
-        // im.houghLinesP()
+      var processed = im;
+        // processed.convertGrayscale()
+        // processed.canny(5, 300)
+        // processed.houghLinesP()
         
-        im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){ // consider adding opts instead of empty object
-          if (!faces) {
+        processed.detectObject(cv.FACE_CASCADE, {}, function(err, faces){ // consider adding opts instead of empty object
+          if (faces.length === 0) {
             return newImage = im.toBuffer();
           } else {
       
@@ -74,7 +75,7 @@
                 if (face === undefined) face = faces[i];
                 if (face.width < faces[i].width && faces[i].width < 120) face = faces[i]; // if no face has already been selected, set equal to first face detected
               } 
-            
+
             if (face) {
               console.log('face size: ' + face.width)
               im.ellipse(face.x + face.width/2, face.y + face.height/2, face.width/2, face.height/2);
